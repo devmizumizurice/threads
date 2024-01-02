@@ -9,11 +9,11 @@ interface Props {
   id: string;
   name: string;
   username: string;
-  imgUrl: string;
+  imageUrl: string;
   personType: string;
 }
 
-const UserCard = ({ id, name, username, imgUrl, personType }: Props) => {
+const UserCard = ({ id, name, username, imageUrl, personType }: Props) => {
   const router = useRouter();
 
   const isCommunity = personType === "Community";
@@ -23,7 +23,7 @@ const UserCard = ({ id, name, username, imgUrl, personType }: Props) => {
       <div className="user-card_avatar">
         <div className="relative h-12 w-12">
           <Image
-            src={imgUrl}
+            src={imageUrl}
             alt="user_logo"
             fill
             className="rounded-full object-cover"
