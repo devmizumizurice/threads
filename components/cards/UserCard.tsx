@@ -40,7 +40,7 @@ const UserCard = ({ id, name, username, imgUrl, personType }: Props) => {
         className="user-card_btn"
         onClick={() => {
           if (isCommunity) {
-            router.push(`/communities/${id}`);
+            router.push(`/organizations/${id}`);
           } else {
             router.push(`/profile/${id}`);
           }
