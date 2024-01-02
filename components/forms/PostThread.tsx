@@ -19,6 +19,7 @@ import { Textarea } from "@/components/ui/textarea";
 
 import { createThread } from "@/lib/actions/thread.actions";
 import { ThreadValidation } from "@/lib/validations/thread";
+import { useState } from "react";
 
 interface Props {
   userId: string;
@@ -38,13 +39,18 @@ function PostThread({ userId }: Props) {
     },
   });
 
+  const [isPosting, setPosting] = useState(false);
+
   const onSubmit = async (values: z.infer<typeof ThreadValidation>) => {
+    setPosting(true);
+
     await createThread({
       text: values.thread,
       author: userId,
       communityId: organization ? organization.id : null,
       path: pathname,
     });
+    setPosting(false);
 
     router.push("/");
   };
@@ -71,7 +77,7 @@ function PostThread({ userId }: Props) {
           )}
         />
 
-        <Button type="submit" className="bg-primary-500">
+        <Button type="submit" className="bg-primary-500" disabled={isPosting}>
           Post Thread
         </Button>
       </form>

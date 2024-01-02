@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import Searchbar from "@/components/shared/SearchBar";
 
 import CommunityCard from "@/components/cards/CommunityCard";
+import Pagination from "@/components/shared/Pagination";
 import { fetchCommunities } from "@/lib/actions/community.actions";
 import { fetchUser } from "@/lib/actions/user.actions";
 
@@ -51,6 +52,12 @@ const Page = async ({
           </>
         )}
       </section>
+
+      <Pagination
+        path="communities"
+        pageNumber={searchParams?.page ? +searchParams.page : 1}
+        isNext={result.isNext}
+      />
     </>
   );
 };

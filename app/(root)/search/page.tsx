@@ -2,6 +2,7 @@ import { currentUser } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
 
 import UserCard from "@/components/cards/UserCard";
+import Pagination from "@/components/shared/Pagination";
 import Searchbar from "@/components/shared/SearchBar";
 import { fetchUser, fetchUsers } from "@/lib/actions/user.actions";
 
@@ -47,6 +48,12 @@ const Page = async ({
           </>
         )}
       </div>
+
+      <Pagination
+        path="search"
+        pageNumber={searchParams?.page ? +searchParams.page : 1}
+        isNext={result.isNext}
+      />
     </section>
   );
 };

@@ -1,18 +1,25 @@
 import ThreadCard from "@/components/cards/ThreadCard";
+import Pagination from "@/components/shared/Pagination";
 import { fetchThreads } from "@/lib/actions/thread.actions";
 import { fetchUser } from "@/lib/actions/user.actions";
 import { currentUser } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
 
-const Home = async () => {
+const Home = async ({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | undefined };
+}) => {
   const user = await currentUser();
   if (!user) return null;
 
   const userInfo = await fetchUser(user.id);
   if (!userInfo?.onboarded) redirect("/onboarding");
 
-  const res = await fetchThreads(1, 30);
-
+  const res = await fetchThreads(
+    searchParams.page ? +searchParams.page : 1,
+    30
+  );
   return (
     <>
       <h1 className="text-white">Home</h1>
@@ -39,6 +46,12 @@ const Home = async () => {
           </>
         )}
       </section>
+
+      <Pagination
+        path="/"
+        pageNumber={searchParams?.page ? +searchParams.page : 1}
+        isNext={res.isNext}
+      />
     </>
   );
 };

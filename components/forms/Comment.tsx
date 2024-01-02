@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 
 import { addCommentToThread } from "@/lib/actions/thread.actions";
 import { CommentValidation } from "@/lib/validations/thread";
+import { useState } from "react";
 
 interface Props {
   threadId: string;
@@ -36,13 +37,17 @@ function Comment({ threadId, currentUserImg, currentUserId }: Props) {
     },
   });
 
+  const [isPosting, setPosting] = useState(false);
+
   const onSubmit = async (values: z.infer<typeof CommentValidation>) => {
+    setPosting(true);
     await addCommentToThread(
       threadId,
       values.thread,
       JSON.parse(currentUserId),
       pathname
     );
+    setPosting(false);
 
     form.reset();
   };
@@ -76,7 +81,7 @@ function Comment({ threadId, currentUserImg, currentUserId }: Props) {
           )}
         />
 
-        <Button type="submit" className="comment-form_btn">
+        <Button type="submit" className="comment-form_btn" disabled={isPosting}>
           Reply
         </Button>
       </form>
