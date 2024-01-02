@@ -17,6 +17,7 @@ import { isBase64Image } from "@/lib/utils";
 import { UserValidation } from "@/lib/validations/user";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
+import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { ChangeEvent, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -39,6 +40,7 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
   const { startUpload } = useUploadThing("media");
   const router = useRouter();
   const pathname = usePathname();
+  const [isPosting, setPosting] = useState(false);
 
   const form = useForm({
     resolver: zodResolver(UserValidation),
@@ -73,30 +75,34 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
   };
 
   const onSubmit = async (values: z.infer<typeof UserValidation>) => {
+    setPosting(true);
+
     const blob = values.profile_photo;
     const hasImageChanged = isBase64Image(blob);
-
-    if (hasImageChanged) {
-      const imageRes = await startUpload(files);
-      if (imageRes && imageRes[0].url) {
-        values.profile_photo = imageRes[0].url;
+    try {
+      if (hasImageChanged) {
+        const imageRes = await startUpload(files);
+        if (imageRes && imageRes[0].url) {
+          values.profile_photo = imageRes[0].url;
+        }
       }
-    }
-    await updateUser({
-      userId: user.id,
-      name: values.name,
-      username: values.username,
-      bio: values.bio,
-      image: values.profile_photo,
-      path: pathname,
-    });
+      await updateUser({
+        userId: user.id,
+        name: values.name,
+        username: values.username,
+        bio: values.bio,
+        image: values.profile_photo,
+        path: pathname,
+      });
 
-    if (pathname === "/profile/edit") {
-      router.back();
-    } else {
-      console.log("hhihihihihi");
-      router.push("/");
-    }
+      if (pathname === "/profile/edit") {
+        router.back();
+      } else {
+        console.log("hhihihihihi");
+        router.push("/");
+      }
+    } catch (error) {}
+    setPosting(false);
   };
 
   return (
@@ -109,36 +115,50 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
           control={form.control}
           name="profile_photo"
           render={({ field }) => (
-            <FormItem className="flex items-center gap-4">
-              <FormLabel className="account-form_image-label">
-                {field.value ? (
-                  <Image
-                    src={field.value}
-                    alt="profile_icon"
-                    width={96}
-                    height={96}
-                    priority
-                    className="rounded-full object-contain"
+            <FormItem className="flex flex-col">
+              <div className="flex flex-row items-center gap-4">
+                <FormLabel className="account-form_image-label">
+                  {field.value ? (
+                    <Image
+                      src={field.value}
+                      alt="profile_icon"
+                      width={96}
+                      height={96}
+                      priority
+                      className="rounded-full object-contain"
+                    />
+                  ) : (
+                    <Image
+                      src="/assets/profile.svg"
+                      alt="profile_icon"
+                      width={24}
+                      height={24}
+                      className="object-contain"
+                    />
+                  )}
+                </FormLabel>
+                <FormControl className="flex-1 text-base-semibold text-gray-200">
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    placeholder="Add profile photo"
+                    className="account-form_image-input"
+                    onChange={(e) => handleImage(e, field.onChange)}
                   />
-                ) : (
-                  <Image
-                    src="/assets/profile.svg"
-                    alt="profile_icon"
-                    width={24}
-                    height={24}
-                    className="object-contain"
-                  />
-                )}
-              </FormLabel>
-              <FormControl className="flex-1 text-base-semibold text-gray-200">
-                <Input
-                  type="file"
-                  accept="image/*"
-                  placeholder="Add profile photo"
-                  className="account-form_image-input"
-                  onChange={(e) => handleImage(e, field.onChange)}
-                />
-              </FormControl>
+                </FormControl>
+              </div>
+              <div className="text-red-500 pt-4">
+                Known issue: Pasting a photo larger than 1 mb will be rejected
+                by the server. Please crop or compress using{" "}
+                <Link
+                  href="https://www.iloveimg.com/"
+                  className="underline"
+                  target="_blank"
+                >
+                  iLoveimg
+                </Link>{" "}
+                before uploading.
+              </div>
             </FormItem>
           )}
         />
@@ -200,7 +220,7 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
             </FormItem>
           )}
         />
-        <Button type="submit" className="bg-primary-500">
+        <Button type="submit" className="bg-primary-500" disabled={isPosting}>
           Submit
         </Button>
       </form>

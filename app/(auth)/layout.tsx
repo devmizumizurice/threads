@@ -1,8 +1,8 @@
+import Providers from "@/components/shared/Providers";
 import { ClerkProvider } from "@clerk/nextjs";
+import { dark } from "@clerk/themes";
 import { Inter } from "next/font/google";
 import { ReactNode } from "react";
-
-import { dark } from "@clerk/themes";
 import "../globals.css";
 
 export const metadata = {
@@ -11,7 +11,6 @@ export const metadata = {
 };
 
 const inter = Inter({ subsets: ["latin"] });
-
 const RootLayout = ({ children }: { children: ReactNode }) => {
   return (
     <ClerkProvider
@@ -23,11 +22,10 @@ const RootLayout = ({ children }: { children: ReactNode }) => {
         <body
           className={`${inter.className} bg-dark-1 flex justify-center items-center h-screen`}
         >
-          {children}
+          <Providers>{children}</Providers>
         </body>
       </html>
     </ClerkProvider>
   );
 };
-
 export default RootLayout;
